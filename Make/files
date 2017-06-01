@@ -1,0 +1,4 @@
+mappedFieldRelaxFvPatchFields.C
+mappedFieldRelaxStagFvPatchFields.C
+
+LIB = $(FOAM_USER_LIBBIN)/libmappedFieldRelax
