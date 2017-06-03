@@ -50,10 +50,10 @@ mappedPatchFieldBase<Type>::mappedPatchFieldBase
     fieldName_(fieldName),
     setAverage_(setAverage),
     average_(average),
-    interpolationScheme_(interpolationScheme),
-    period_(1000),
-    decrement_(0),
-    lag_(500)
+    interpolationScheme_(interpolationScheme)//,
+//    period_(1000),
+//    decrement_(0),
+//    lag_(500)
 {}
 
 
@@ -77,10 +77,10 @@ mappedPatchFieldBase<Type>::mappedPatchFieldBase
     ),
     setAverage_(readBool(dict.lookup("setAverage"))),
     average_(pTraits<Type>(dict.lookup("average"))),
-    interpolationScheme_(interpolationCell<Type>::typeName),
-    period_(readInt(dict.lookup("period"))),
-    decrement_(readInt(dict.lookup("decrement"))),
-    lag_(readInt(dict.lookup("lag")))
+    interpolationScheme_(interpolationCell<Type>::typeName)//,
+//    period_(readInt(dict.lookup("period"))),
+//    decrement_(readInt(dict.lookup("decrement"))),
+//    lag_(readInt(dict.lookup("lag")))
 {
     if (mapper_.mode() == mappedPatchBase::NEARESTCELL)
     {
@@ -101,10 +101,10 @@ mappedPatchFieldBase<Type>::mappedPatchFieldBase
     fieldName_(patchField_.internalField().name()),
     setAverage_(false),
     average_(Zero),
-    interpolationScheme_(interpolationCell<Type>::typeName),
-    period_(1000),
-    decrement_(0),
-    lag_(500)
+    interpolationScheme_(interpolationCell<Type>::typeName)//,
+//    period_(1000),
+//    decrement_(0),
+//    lag_(500)
 {}
 
 
@@ -119,10 +119,10 @@ mappedPatchFieldBase<Type>::mappedPatchFieldBase
     fieldName_(mapper.fieldName_),
     setAverage_(mapper.setAverage_),
     average_(mapper.average_),
-    interpolationScheme_(mapper.interpolationScheme_),
-    period_(mapper.period_),
-    decrement_(mapper.decrement_),
-    lag_(mapper.lag_)
+    interpolationScheme_(mapper.interpolationScheme_)//,
+//    period_(mapper.period_),
+//    decrement_(mapper.decrement_),
+//    lag_(mapper.lag_)
 {}
 
 
@@ -139,10 +139,10 @@ mappedPatchFieldBase<Type>::mappedPatchFieldBase
     fieldName_(base.fieldName_),
     setAverage_(base.setAverage_),
     average_(base.average_),
-    interpolationScheme_(base.interpolationScheme_),
-    period_(base.period_),
-    decrement_(base.decrement_),
-    lag_(base.lag_)
+    interpolationScheme_(base.interpolationScheme_)//,
+//    period_(base.period_),
+//    decrement_(base.decrement_),
+//    lag_(base.lag_)
 {}
 
 
@@ -332,9 +332,9 @@ void mappedPatchFieldBase<Type>::write(Ostream& os) const
     os.writeKeyword("field") << fieldName_ << token::END_STATEMENT << nl;
     os.writeKeyword("setAverage") << setAverage_ << token::END_STATEMENT << nl;
     os.writeKeyword("average") << average_ << token::END_STATEMENT << nl;
-    os.writeKeyword("period") << period_ << token::END_STATEMENT << nl;
-    os.writeKeyword("decrement") << decrement_ << token::END_STATEMENT << nl;
-    os.writeKeyword("lag") << lag_ << token::END_STATEMENT << nl;
+//    os.writeKeyword("period") << period_ << token::END_STATEMENT << nl;
+//    os.writeKeyword("decrement") << decrement_ << token::END_STATEMENT << nl;
+//    os.writeKeyword("lag") << lag_ << token::END_STATEMENT << nl;
     os.writeKeyword("interpolationScheme") << interpolationScheme_
         << token::END_STATEMENT << nl;
 }

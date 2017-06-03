@@ -88,14 +88,14 @@ protected:
         //- Interpolation scheme to use for nearestcell mode
         word interpolationScheme_;
         
-        //- Period between updates of U
-        int period_;
-        
-        //- How much smaller should the period between updates get every time?
-        const int decrement_;
-        
-        //- Time lag between updates of U and updates of p
-        const int lag_;
+//        //- Period between updates of U
+//        int period_;
+//        
+//        //- How much smaller should the period between updates get every time?
+//        const int decrement_;
+//        
+//        //- Time lag between updates of U and updates of p
+//        const int lag_;
 
 public:
 
@@ -158,31 +158,31 @@ public:
         //- Write
         virtual void write(Ostream&) const;
         
-        // Access
-        
-            //- Period between updates of U
-            int period() const
-            {
-                return period_;
-            }
-            
-            void setPeriod(int newVal)
-            {
-                period_ = max(1,newVal);
-                return;
-            }
-            
-            //- How much smaller should the period between updates get every time?
-            int decrement() const
-            {
-                return decrement_;
-            }
-            
-            //- Time lag between updates of U and updates of p
-            int lag() const
-            {
-                return lag_;
-            }
+//        // Access
+//        
+//            //- Period between updates of U
+//            int period() const
+//            {
+//                return period_;
+//            }
+//            
+//            void setPeriod(int newVal)
+//            {
+//                period_ = max(1,newVal);
+//                return;
+//            }
+//            
+//            //- How much smaller should the period between updates get every time?
+//            int decrement() const
+//            {
+//                return decrement_;
+//            }
+//            
+//            //- Time lag between updates of U and updates of p
+//            int lag() const
+//            {
+//                return lag_;
+//            }
 };
 
 

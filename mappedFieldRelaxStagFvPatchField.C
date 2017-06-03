@@ -153,8 +153,8 @@ void Foam::mappedFieldRelaxStagFvPatchField<Type>::updateCoeffs()
                         this->patchField_.patch().boundaryMesh().mesh().
                         time().value()
                     )
-                    + this->lag()
-                ) % this->period()
+                    + 500
+                ) % 1000
             ) > 0
         )
     )

@@ -97,6 +97,17 @@ class mappedFieldRelaxFvPatchField
     public mappedPatchFieldBase<Type>
 {
 
+protected:
+        
+        //- Period between updates of U
+        int period_;
+        
+        //- How much smaller should the period between updates get every time?
+        const int decrement_;
+        
+        //- Time lag between updates of U and updates of p
+        const int lag_;
+
 public:
 
     //- Runtime type information
@@ -137,7 +148,10 @@ public:
             const word& fieldName,
             const bool setAverage,
             const Type average,
-            const word& interpolationScheme
+            const word& interpolationScheme,
+            const int period,
+            const int decrement,
+            const int lag
         );
 
         //- Construct by mapping given
