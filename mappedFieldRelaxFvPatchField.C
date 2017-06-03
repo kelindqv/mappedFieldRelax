@@ -176,7 +176,13 @@ void Foam::mappedFieldRelaxFvPatchField<Type>::updateCoeffs()
                     time().value()
                 ) % period_
             ) > 0
-        )
+        ) ||
+        // Don't update when Time==0
+        static_cast<int>
+        (
+            this->patchField_.patch().boundaryMesh().mesh().
+            time().value()
+        ) == 0
         // Update only on first iteration (and do restarts with write to disk in between)
 //        (
 //            !firstTime_ // not implemented
