@@ -188,6 +188,7 @@ void Foam::mappedFieldRelaxFvPatchField<Type>::updateCoeffs()
 
     this->operator==(this->mappedField());
 //    this->setPeriod(this->period_ - this->decrement_);
+    period_ = period_ - decrement_;
 
     if (debug)
     {
