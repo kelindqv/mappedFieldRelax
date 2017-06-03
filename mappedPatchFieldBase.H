@@ -87,7 +87,15 @@ protected:
 
         //- Interpolation scheme to use for nearestcell mode
         word interpolationScheme_;
-
+        
+        //- Period between updates of U
+        int period_;
+        
+        //- How much smaller should the period between updates get every time?
+        int periodDec_;
+        
+        //- Time lag between updates of U and updates of p
+        int lag_;
 
 public:
 

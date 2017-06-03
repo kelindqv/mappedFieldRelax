@@ -147,7 +147,15 @@ void Foam::mappedFieldRelaxFvPatchField<Type>::updateCoeffs()
     (
         this->updated() || 
         // Update at regular intervals:
-        ( (static_cast<int>(this->patchField_.patch().boundaryMesh().mesh().time().value()) % 1000) > 0)
+        (
+            (
+                static_cast<int>
+                (
+                    this->patchField_.patch().boundaryMesh().mesh().
+                    time().value()
+                ) % 1000
+            ) > 0
+        )
         // Update only on first iteration (and do restarts with write to disk in between)
 //        (
 //            this->patchField_.patch().boundaryMesh().mesh().time().value() == 
