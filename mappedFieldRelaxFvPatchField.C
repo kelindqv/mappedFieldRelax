@@ -40,9 +40,9 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
     fixedValueFvPatchField<Type>(p, iF),
     mappedPatchBase(p.patch()),
     mappedPatchFieldBase<Type>(*this, *this),
-    period_(1000),
-    decrement_(0),
-    lag_(500)
+    step_(1000),
+    decrement_(1),
+    nextUpd_(1000)
 {}
 
 
@@ -57,10 +57,11 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
     fixedValueFvPatchField<Type>(p, iF, dict),
     mappedPatchBase(p.patch(), dict),
     mappedPatchFieldBase<Type>(*this, *this, dict),
-    period_(readInt(dict.lookup("period"))),
-    decrement_(readInt(dict.lookup("decrement"))),
-    lag_(readInt(dict.lookup("lag")))
-{}
+    step_(readInt(dict.lookup("initStep"))),
+    decrement_(readScalar(dict.lookup("decrement")))
+{
+    nextUpd_ = step_;
+}
 
 
 template<class Type>
@@ -75,9 +76,9 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
     fixedValueFvPatchField<Type>(ptf, p, iF, mapper),
     mappedPatchBase(p.patch(), ptf),
     mappedPatchFieldBase<Type>(*this, *this, ptf),
-    period_(ptf.period_),
+    step_(ptf.step_),
     decrement_(ptf.decrement_),
-    lag_(ptf.lag_)
+    nextUpd_(ptf.nextUpd_)
 {}
 
 
@@ -98,9 +99,9 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
     const bool setAverage,
     const Type average,
     const word& interpolationScheme,
-    const int period,
-    const int decrement,
-    const int lag
+    const int step,
+    const scalar decrement,
+    const int nextUpd
 )
 :
     fixedValueFvPatchField<Type>(p, iF),
@@ -121,9 +122,9 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
         average,
         interpolationScheme
     ),
-    period_(period),
+    step_(step),
     decrement_(decrement),
-    lag_(lag)
+    nextUpd_(nextUpd)
 {}
 
 
@@ -136,9 +137,9 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
     fixedValueFvPatchField<Type>(ptf),
     mappedPatchBase(ptf.patch().patch(), ptf),
     mappedPatchFieldBase<Type>(ptf),
-    period_(ptf.period_),
+    step_(ptf.step_),
     decrement_(ptf.decrement_),
-    lag_(ptf.lag_)
+    nextUpd_(ptf.nextUpd_)
 {}
 
 
@@ -152,9 +153,9 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
     fixedValueFvPatchField<Type>(ptf, iF),
     mappedPatchBase(ptf.patch().patch(), ptf),
     mappedPatchFieldBase<Type>(*this, *this, ptf),
-    period_(ptf.period_),
+    step_(ptf.step_),
     decrement_(ptf.decrement_),
-    lag_(ptf.lag_)
+    nextUpd_(ptf.nextUpd_)
 {}
 
 
@@ -167,26 +168,30 @@ void Foam::mappedFieldRelaxFvPatchField<Type>::updateCoeffs()
     if
     (
         this->updated() || 
-        // Update at regular intervals:
-        (
-            (
-                static_cast<int>
-                (
-                    this->patchField_.patch().boundaryMesh().mesh().
-                    time().value()
-                ) % period_
-            ) > 0
-        ) ||
-        // Don't update when Time==0
-        static_cast<int>
-        (
+        static_cast<int>(
             this->patchField_.patch().boundaryMesh().mesh().
             time().value()
-        ) == 0
-        // Update only on first iteration (and do restarts with write to disk in between)
+        ) != nextUpd_
+//        // Update at regular intervals:
 //        (
-//            !firstTime_ // not implemented
-//        )
+//            (
+//                static_cast<int>
+//                (
+//                    this->patchField_.patch().boundaryMesh().mesh().
+//                    time().value()
+//                ) % period_
+//            ) > 0
+//        ) ||
+//        // Don't update when Time==0
+//        static_cast<int>
+//        (
+//            this->patchField_.patch().boundaryMesh().mesh().
+//            time().value()
+//        ) == 0
+//        // Update only on first iteration (and do restarts with write to disk in between)
+////        (
+////            !firstTime_ // not implemented
+////        )
     )
     {
         return;
@@ -194,7 +199,9 @@ void Foam::mappedFieldRelaxFvPatchField<Type>::updateCoeffs()
 
     this->operator==(this->mappedField());
 //    this->setPeriod(this->period_ - this->decrement_);
-    period_ = period_ - decrement_;
+//    period_ = period_ - decrement_;
+    step_ = static_cast<int>(step_*decrement_);
+    nextUpd_ = nextUpd_ + step_;
 
     if (debug)
     {
@@ -216,9 +223,8 @@ void Foam::mappedFieldRelaxFvPatchField<Type>::write(Ostream& os) const
     fvPatchField<Type>::write(os);
     mappedPatchBase::write(os);
     mappedPatchFieldBase<Type>::write(os);
-    os.writeKeyword("period") << period_ << token::END_STATEMENT << nl;
+    os.writeKeyword("initStep") << step_ << token::END_STATEMENT << nl;
     os.writeKeyword("decrement") << decrement_ << token::END_STATEMENT << nl;
-    os.writeKeyword("lag") << lag_ << token::END_STATEMENT << nl;
     this->writeEntry("value", os);
 }
 

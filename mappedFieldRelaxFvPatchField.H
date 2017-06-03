@@ -28,9 +28,8 @@ Group
     grpGenericBoundaryConditions grpCoupledBoundaryConditions
 
 Description
-    This boundary condition provides a self-contained version of the \c mapped
-    condition.  It does not use information on the patch; instead it holds
-    thr data locally.
+    A mappedField-derived BC which updates the values every initStep iterations
+    with and optional (0<x<=1) decrement on each update.
 
 Usage
     \table
@@ -49,6 +48,8 @@ Usage
         setAverage      no;             // apply an average value
         average         0;              // average to apply if setAverage
         value           uniform 0;      // place holder
+        initStep        100;
+        decrement       0.95;
     }
     \endverbatim
 
@@ -99,14 +100,17 @@ class mappedFieldRelaxFvPatchField
 
 protected:
         
-        //- Period between updates of U
-        int period_;
+        //- Current step size
+        int step_;
         
-        //- How much smaller should the period between updates get every time?
-        const int decrement_;
+        //- How much smaller should the sted size get every update?
+        const scalar decrement_;
         
-        //- Time lag between updates of U and updates of p
-        const int lag_;
+        //- Which iteration is up for update?
+        int nextUpd_;
+        
+//        //- Time lag between updates of U and updates of p
+//        const int lag_;
 
 public:
 
@@ -149,9 +153,9 @@ public:
             const bool setAverage,
             const Type average,
             const word& interpolationScheme,
-            const int period,
-            const int decrement,
-            const int lag
+            const int step,
+            const scalar decrement,
+            const int nextUpd
         );
 
         //- Construct by mapping given
