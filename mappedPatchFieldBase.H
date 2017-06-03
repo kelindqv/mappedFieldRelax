@@ -168,7 +168,7 @@ public:
             
             void setPeriod(int newVal)
             {
-                period_ = newVal;
+                period_ = max(1,newVal);
                 return;
             }
             
