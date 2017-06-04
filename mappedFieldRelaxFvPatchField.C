@@ -60,6 +60,7 @@ Foam::mappedFieldRelaxFvPatchField<Type>::mappedFieldRelaxFvPatchField
     step_(readInt(dict.lookup("initStep"))),
     decrement_(readScalar(dict.lookup("decrement")))
 {
+    step_ = max(100,step_);
     nextUpd_ = step_;
 }
 
@@ -200,7 +201,7 @@ void Foam::mappedFieldRelaxFvPatchField<Type>::updateCoeffs()
     this->operator==(this->mappedField());
 //    this->setPeriod(this->period_ - this->decrement_);
 //    period_ = period_ - decrement_;
-    step_ = static_cast<int>(step_*decrement_);
+    step_ = max(100,static_cast<int>(step_*decrement_));
     nextUpd_ = nextUpd_ + step_;
 
     if (debug)

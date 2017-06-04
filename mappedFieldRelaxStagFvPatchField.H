@@ -97,6 +97,21 @@ class mappedFieldRelaxStagFvPatchField
     public mappedPatchFieldBase<Type>
 {
 
+protected:
+        
+        //- Current step size
+        int step_;
+        
+        //- How much smaller should the sted size get every update?
+        const scalar decrement_;
+        
+        //- Which iteration is up for update?
+        int nextUpd_;
+        
+        //- Time lag between updates of U and updates of p
+        int lag_;
+
+
 public:
 
     //- Runtime type information
@@ -137,7 +152,11 @@ public:
             const word& fieldName,
             const bool setAverage,
             const Type average,
-            const word& interpolationScheme
+            const word& interpolationScheme,
+            const int step,
+            const scalar decrement,
+            const int nextUpd,
+            const int lag
         );
 
         //- Construct by mapping given
