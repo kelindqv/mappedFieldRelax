@@ -221,6 +221,8 @@ void Foam::mappedFieldRelaxStagFvPatchField<Type>::write(Ostream& os) const
     fvPatchField<Type>::write(os);
     mappedPatchBase::write(os);
     mappedPatchFieldBase<Type>::write(os);
+    os.writeKeyword("initStep") << step_ << token::END_STATEMENT << nl;
+    os.writeKeyword("decrement") << decrement_ << token::END_STATEMENT << nl;
     this->writeEntry("value", os);
 }
 
