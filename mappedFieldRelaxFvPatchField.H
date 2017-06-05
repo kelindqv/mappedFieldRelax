@@ -100,17 +100,20 @@ class mappedFieldRelaxFvPatchField
 
 protected:
         
-        //- Current step size
-        int step_;
-        
-        //- How much smaller should the sted size get every update?
-        const scalar decrement_;
-        
-        //- Which iteration is up for update?
-        int nextUpd_;
-        
+//        //- Current step size
+//        int step_;
+//        
+//        //- How much smaller should the sted size get every update?
+//        const scalar decrement_;
+//        
+//        //- Which iteration is up for update?
+//        int nextUpd_;
+//        
 //        //- Time lag between updates of U and updates of p
 //        const int lag_;
+
+        // Period between updates
+        const int period_;
 
 public:
 
@@ -153,9 +156,10 @@ public:
             const bool setAverage,
             const Type average,
             const word& interpolationScheme,
-            const int step,
-            const scalar decrement,
-            const int nextUpd
+            const int period_
+//            const int step,
+//            const scalar decrement,
+//            const int nextUpd
         );
 
         //- Construct by mapping given
