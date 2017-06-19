@@ -342,6 +342,17 @@ void Foam::mappedFieldRelaxStagFvPatchField<Type>::updateCoeffs()
                 ) % period_
             ) > 0
         ) ||
+        // Don't update until after lag is passed
+        (
+            (
+                static_cast<int>
+                (
+                    this->patchField_.patch().boundaryMesh().mesh().
+                    time().value()
+                )
+                - lag_
+            ) < 0
+        ) ||
         // Don't update when Time==0
         static_cast<int>
         (
