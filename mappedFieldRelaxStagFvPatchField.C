@@ -176,6 +176,149 @@ Foam::mappedFieldRelaxStagFvPatchField<Type>::mappedFieldRelaxStagFvPatchField
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+//// Overload the mapped field - if pressure is too big, scale it back
+//template<class Type>
+//tmp<Field<Type>> Foam::mappedFieldRelaxStagFvPatchField<Type>::mappedField() const
+//{
+//    typedef GeometricField<Type, fvPatchField, volMesh> fieldType;
+
+//    // Since we're inside initEvaluate/evaluate there might be processor
+//    // comms underway. Change the tag we use.
+//    int oldTag = UPstream::msgType();
+//    UPstream::msgType() = oldTag + 1;
+
+//    const fvMesh& thisMesh = patchField_.patch().boundaryMesh().mesh();
+//    const fvMesh& nbrMesh = refCast<const fvMesh>(mapper_.sampleMesh());
+
+//    // Result of obtaining remote values
+//    tmp<Field<Type>> tnewValues(new Field<Type>(0));
+//    Field<Type>& newValues = tnewValues.ref();
+
+//    switch (mapper_.mode())
+//    {
+//        case mappedPatchBase::NEARESTCELL:
+//        {
+//            const mapDistribute& distMap = mapper_.map();
+
+//            if (interpolationScheme_ != interpolationCell<Type>::typeName)
+//            {
+//                // Send back sample points to the processor that holds the cell
+//                vectorField samples(mapper_.samplePoints());
+//                distMap.reverseDistribute
+//                (
+//                    (
+//                        mapper_.sameRegion()
+//                      ? thisMesh.nCells()
+//                      : nbrMesh.nCells()
+//                    ),
+//                    point::max,
+//                    samples
+//                );
+
+//                autoPtr<interpolation<Type>> interpolator
+//                (
+//                    interpolation<Type>::New
+//                    (
+//                        interpolationScheme_,
+//                        sampleField()
+//                    )
+//                );
+//                const interpolation<Type>& interp = interpolator();
+
+//                newValues.setSize(samples.size(), pTraits<Type>::max);
+//                forAll(samples, celli)
+//                {
+//                    if (samples[celli] != point::max)
+//                    {
+//                        newValues[celli] = interp.interpolate
+//                        (
+//                            samples[celli],
+//                            celli
+//                        );
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                newValues = sampleField();
+//            }
+
+//            distMap.distribute(newValues);
+
+//            break;
+//        }
+//        case mappedPatchBase::NEARESTPATCHFACE:
+//        case mappedPatchBase::NEARESTPATCHFACEAMI:
+//        {
+//            const label nbrPatchID =
+//                nbrMesh.boundaryMesh().findPatchID(mapper_.samplePatch());
+
+//            if (nbrPatchID < 0)
+//            {
+//                FatalErrorInFunction
+//                 << "Unable to find sample patch " << mapper_.samplePatch()
+//                 << " in region " << mapper_.sampleRegion()
+//                 << " for patch " << patchField_.patch().name() << nl
+//                 << abort(FatalError);
+//            }
+
+//            const fieldType& nbrField = sampleField();
+
+//            newValues = nbrField.boundaryField()[nbrPatchID];
+//            mapper_.distribute(newValues);
+
+//            break;
+//        }
+//        case mappedPatchBase::NEARESTFACE:
+//        {
+//            Field<Type> allValues(nbrMesh.nFaces(), Zero);
+
+//            const fieldType& nbrField = sampleField();
+
+//            forAll(nbrField.boundaryField(), patchi)
+//            {
+//                const fvPatchField<Type>& pf =
+//                    nbrField.boundaryField()[patchi];
+//                label faceStart = pf.patch().start();
+
+//                forAll(pf, facei)
+//                {
+//                    allValues[faceStart++] = pf[facei];
+//                }
+//            }
+
+//            mapper_.distribute(allValues);
+//            newValues.transfer(allValues);
+
+//            break;
+//        }
+//        default:
+//        {
+//            FatalErrorInFunction
+//             << "Unknown sampling mode: " << mapper_.mode()
+//             << nl << abort(FatalError);
+//        }
+//    }
+
+//    if (setAverage_)
+//    {
+////        Type averagePsi =
+////            gSum(patchField_.patch().magSf()*newValues)
+////           /gSum(patchField_.patch().magSf());
+//        Type tehMax = gMax(newValues)
+
+//        if (tehMax > mag(average_))
+//        {
+//            newValues -= average_;
+//        }
+//    }
+
+//    // Restore tag
+//    UPstream::msgType() = oldTag;
+
+//    return tnewValues;
+//}
+
 template<class Type>
 void Foam::mappedFieldRelaxStagFvPatchField<Type>::updateCoeffs()
 {
@@ -198,7 +341,13 @@ void Foam::mappedFieldRelaxStagFvPatchField<Type>::updateCoeffs()
                     - lag_
                 ) % period_
             ) > 0
-        )
+        ) ||
+        // Don't update when Time==0
+        static_cast<int>
+        (
+            this->patchField_.patch().boundaryMesh().mesh().
+            time().value()
+        ) == 0
     )
     {
         return;
