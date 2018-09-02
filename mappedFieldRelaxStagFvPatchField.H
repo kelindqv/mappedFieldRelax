@@ -44,11 +44,19 @@ Usage
     \verbatim
     <patchName>
     {
-        type            mappedField;
-        fieldName       T;              // optional field name
-        setAverage      no;             // apply an average value
-        average         0;              // average to apply if setAverage
-        value           uniform 0;      // place holder
+        type            mappedFieldRelaxStag;
+        sampleMode      nearestPatchFace;
+        sampleRegion    fluid;    // if multi-region case
+        samplePatch     inlet;
+        offsetMode      uniform;
+        offset          (-0.079 0 0);
+        field           p_rgh;
+        setAverage      0;
+        average         0;
+        interpolationScheme cell;
+        period          1500;      // # of iter. between updates
+        lag             752;       // additional iters (=update at period+iter)
+        value           uniform 0; 
     }
     \endverbatim
 
